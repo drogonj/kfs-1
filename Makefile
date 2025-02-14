@@ -1,9 +1,11 @@
 BOOTLOADER = src/x86/boot.s
-KERNEL = src/kernel.c
+KERNEL = src/kernel.c \
+         src/vga/cursor.c
 LINKER = linker.ld
 
 BOOTLOADER_OBJ = build/boot.o
-KERNEL_OBJ = build/kernel.o
+KERNEL_OBJ = build/kernel.o \
+			 build/vga/cursor.o
 
 GCC_FLAGS = -march=i386 -m32 -ffreestanding -O2 -fno-builtin -fno-exceptions -fno-stack-protector -nostdlib -nodefaultlibs
 LD_FLAGS = -m elf_i386
@@ -20,7 +22,7 @@ $(OUT): $(BOOTLOADER_OBJ) $(KERNEL_OBJ)
 	@printf "\033[32mBuild successful ✓\033[0m\n"
 
 $(OBJDIR)/%.o: src/%.c | $(OBJDIR)
-	@mkdir -p $(OBJDIR)
+	@mkdir -p $(OBJDIR) $(OBJDIR)/vga
 	@gcc $(GCC_FLAGS) -c $< -o $@
 	@echo "Compiled $< -> $@"
 
@@ -33,7 +35,7 @@ run: $(OUT)
 	@qemu-system-i386 $(QEMU_FLAGS) $(OUT) | printf "\033[32mRunning... ✓\033[0m\n"
 
 clean:
-	@rm -f $(OBJDIR)/*.o
+	@rm -rf $(OBJDIR)/*
 	@echo "\033[32mCleaned ✓\033[0m"
 
 fclean: clean
