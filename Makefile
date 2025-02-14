@@ -1,11 +1,20 @@
 BOOTLOADER = src/x86/boot.s
 KERNEL = src/kernel.c \
-         src/vga/cursor.c
+         src/vga/cursor.c \
+		 src/vga/print.c \
+		 src/lib/ft_strchr.c \
+		 src/lib/ft_strcmp.c \
+		 src/lib/ft_strlen.c
+
 LINKER = linker.ld
 
 BOOTLOADER_OBJ = build/boot.o
 KERNEL_OBJ = build/kernel.o \
-			 build/vga/cursor.o
+			 build/vga/cursor.o \
+			 build/vga/print.o \
+			 build/lib/ft_strchr.o \
+			 build/lib/ft_strcmp.o \
+			 build/lib/ft_strlen.o
 
 GCC_FLAGS = -march=i386 -m32 -ffreestanding -O2 -fno-builtin -fno-exceptions -fno-stack-protector -nostdlib -nodefaultlibs
 LD_FLAGS = -m elf_i386
@@ -22,7 +31,7 @@ $(OUT): $(BOOTLOADER_OBJ) $(KERNEL_OBJ)
 	@printf "\033[32mBuild successful ✓\033[0m\n"
 
 $(OBJDIR)/%.o: src/%.c | $(OBJDIR)
-	@mkdir -p $(OBJDIR) $(OBJDIR)/vga
+	@mkdir -p $(OBJDIR) $(OBJDIR)/vga $(OBJDIR)/lib
 	@gcc $(GCC_FLAGS) -c $< -o $@
 	@echo "Compiled $< -> $@"
 

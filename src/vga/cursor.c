@@ -1,5 +1,8 @@
 #include "../../include/kernel.h"
 
+extern unsigned int tty_x;
+extern unsigned int tty_y;
+
 void disable_cursor() {
     __asm__ volatile (
         "mov $0x3D4, %%dx   \n\t"   // VGA CRT Control's port
@@ -28,6 +31,7 @@ void enable_cursor() {
         : 
         : "eax", "edx", "memory"
     );
+    set_cursor_pos(tty_x, tty_y);
 }
 
 void set_cursor_pos(uint16_t x, uint16_t y) {
