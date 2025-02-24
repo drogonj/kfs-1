@@ -12,17 +12,18 @@ void clear_term() {
 
 void kmain() {
     clear_term();
-    set_cursor_pos(0, 0);
     disable_cursor();
     set_tty_color(VGA_COLOR(LIGHT_BLUE, 0));
-    kputstr(
-        ";;LIGHT_BLUE;;"  \
+    printk(
         "  __   ___   \n" \
         " /. | (__ \\ \n" \
         "(_  _) / _/  \n" \
         "  (_) (____)   " \
-        ";;CYAN;;kfs-1, a kernel from scratch;;WHITE;;\n\n"
     );
-    kputstr(";;LIGHT_RED;;$ ;;WHITE;;");
+    set_tty_color(VGA_COLOR(CYAN, 0));
+    printk("kfs-1, a kernel from scratch\n\n");
+    set_tty_color(VGA_COLOR(LIGHT_RED, 0));
+    printk("$ ");
+    set_tty_color(VGA_COLOR(WHITE, 0));
     enable_cursor();
 }

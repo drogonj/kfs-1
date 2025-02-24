@@ -1,23 +1,14 @@
-BOOTLOADER = src/x86/boot.s
-KERNEL = src/kernel.c \
-         src/vga/cursor.c \
-		 src/vga/print.c \
-		 src/lib/ft_strchr.c \
-		 src/lib/ft_strcmp.c \
-		 src/lib/ft_strlen.c
+KERNEL_SRC = $(shell find src -name '*.c') $(shell find src -name '*.s')
+LIB_SRC =  $(shell find lib -name '*.c')
 
 LINKER = linker.ld
 
-BOOTLOADER_OBJ = build/boot.o
-KERNEL_OBJ = build/kernel.o \
-			 build/vga/cursor.o \
-			 build/vga/print.o \
-			 build/lib/ft_strchr.o \
-			 build/lib/ft_strcmp.o \
-			 build/lib/ft_strlen.o
+KERNEL_OBJ = $(patsubst src/%.c, build/%.o, $(filter %.c,$(KERNEL_SRC))) \
+             $(patsubst src/%.s, build/%.o, $(filter %.s,$(KERNEL_SRC)))
+LIB_OBJ = $(patsubst lib/%.c, build/lib/%.o, $(LIB_SRC))
 
-GCC_FLAGS = -march=i386 -m32 -ffreestanding -O2 -fno-builtin -fno-exceptions -fno-stack-protector -nostdlib -nodefaultlibs
-LD_FLAGS = -m elf_i386
+GCC_FLAGS = -g -march=i386 -m32 -ffreestanding -O2 -fno-builtin -fno-exceptions -fno-stack-protector -nostdlib -nodefaultlibs
+LD_FLAGS = -g -m elf_i386
 QEMU_FLAGS = -kernel
 
 OUT = kfs-1.bin
@@ -26,22 +17,33 @@ OBJDIR = build
 
 all: $(OUT)
 
-$(OUT): $(BOOTLOADER_OBJ) $(KERNEL_OBJ)
-	@ld $(LD_FLAGS) -T $(LINKER) -o $(OUT) $(BOOTLOADER_OBJ) $(KERNEL_OBJ)
+$(OUT): $(KERNEL_OBJ) $(LIB_OBJ)
+	@ld $(LD_FLAGS) -T $(LINKER) -o $@ $^
 	@printf "\033[32mBuild successful ✓\033[0m\n"
 
-$(OBJDIR)/%.o: src/%.c | $(OBJDIR)
-	@mkdir -p $(OBJDIR) $(OBJDIR)/vga $(OBJDIR)/lib
+$(OBJDIR)/%.o: src/%.c
+	@mkdir -p $(dir $@)
 	@gcc $(GCC_FLAGS) -c $< -o $@
 	@echo "Compiled $< -> $@"
 
-$(OBJDIR)/%.o: src/x86/%.s | $(OBJDIR)
-	@mkdir -p $(OBJDIR)
+$(OBJDIR)/lib/%.o: lib/%.c
+	@mkdir -p $(dir $@)
+	@gcc $(GCC_FLAGS) -c $< -o $@
+	@echo "Compiled $< -> $@"
+
+$(OBJDIR)/%.o: src/%.s
+	@mkdir -p $(dir $@)
 	@as -32 $< -o $@
 	@echo "Assembled $< -> $@"
 
-run: $(OUT)
-	@qemu-system-i386 $(QEMU_FLAGS) $(OUT) | printf "\033[32mRunning... ✓\033[0m\n"
+run r: $(OUT)
+	@qemu-system-i386 $(QEMU_FLAGS) $(OUT)
+	@printf "\033[32mRunning... ✓\033[0m\n"
+
+debug rd: $(OUT)
+	@qemu-system-i386 $(QEMU_FLAGS) $(OUT) -s -S &
+	@printf "\033[32mRunning... ✓\033[0m\n"
+	@gdb -ex "target remote :1234" $(OUT)
 
 clean:
 	@rm -rf $(OBJDIR)/*
@@ -53,7 +55,8 @@ fclean: clean
 
 re: fclean all
 
-$(OBJDIR):
-	@mkdir -p $(OBJDIR)
+rr: re run
 
-.PHONY: all build run clean fclean re
+rrd: re debug
+
+.PHONY: all run clean fclean re rr rrd r

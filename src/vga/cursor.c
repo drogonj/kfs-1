@@ -1,7 +1,7 @@
 #include "../../include/kernel.h"
 
-extern unsigned int tty_x;
-extern unsigned int tty_y;
+uint16_t tty_x = 0;
+uint16_t tty_y = 0;
 
 void disable_cursor() {
     __asm__ volatile (
