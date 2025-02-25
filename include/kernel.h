@@ -7,13 +7,16 @@
 # include <stdint.h>
 # include <stdarg.h>
 
+# include "./libs.h"
 # include "./colors.h"
 # include "./idt.h"
 
-// globals var
+// vga/cursor.c
 extern uint16_t tty_x;
 extern uint16_t tty_y;
+// vga/printk/kputstr.c
 extern uint16_t tty_color;
+// kernel.c
 extern volatile uint16_t * vbuff;
 
 // vga/cursor.c
@@ -31,10 +34,5 @@ void ft_putpointer(void *ptr);
 void kputchar(char c);
 void kputstr(char * str);
 void set_tty_color(uint16_t color);
-
-// lib
-char *ft_strchr(const char *s, int c);
-int	ft_strcmp(const char *s1, const char *s2);
-unsigned int ft_strlen(const char *s);
 
 #endif

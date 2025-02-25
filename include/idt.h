@@ -5,11 +5,11 @@
 # define kERNEL_CS 0x08
 
 typedef struct idt_entry_s {
-    uint16_t offset_low;
+    uint16_t isr_offset_low;
     uint16_t selector;
     uint8_t zero; // Always zero
     uint8_t type;
-    uint16_t offset_high;
+    uint16_t isr_offset_high;
 } __attribute__((packed)) idt_entry_t;
 
 typedef struct idt_ptr_s {
