@@ -34,6 +34,8 @@ void enable_cursor() {
 // Cursor position is located on two single byte's registers 0x0F (low part) and 0x0E (high part)
 void set_cursor_pos(uint16_t x, uint16_t y) {
     uint16_t offset = (y * VGA_X_SIZE) + x;
+    tty_x = x;
+    tty_y = y;
     outb(0x3D4, 0x0F);
     outb(0x3D5, offset & 0xFF);
     outb(0x3D4, 0x0E);

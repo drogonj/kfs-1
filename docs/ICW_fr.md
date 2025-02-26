@@ -94,6 +94,8 @@ Exemple de valeur :
 3. Si nécessaire, écrire **ICW3** dans le port de données.
 4. Écrire **ICW4** dans le port de données, si demandé par ICW1.
 
+Chaque ICW est envoyé à des ports spécifiques dans un ordre bien défini. La distinction entre ICW2, ICW3, etc., est déterminée par **l'ordre d'écriture** et **le contexte d'initialisation** .
+
 ---
 
 #### **Exemple de configuration des PICs (Maître et Esclave)**

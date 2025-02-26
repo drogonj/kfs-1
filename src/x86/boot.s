@@ -20,8 +20,6 @@
 .section .text
 	start:
 		mov $stack_top, %esp
+		cli
         call kmain
-		hang:
-			cli
-			hlt
-			jmp hang
+		hlt

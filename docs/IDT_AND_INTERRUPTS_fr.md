@@ -155,7 +155,7 @@ void init_idt_desc(u16 select, u32 offset, u16 type, struct idtdesc *desc) {
     desc->offset0_15 = (offset & 0xffff);
     desc->select = select;
     desc->type = type;
-    desc->offset16_31 = (offset >> 16) & 0xffff;
+    desc->offset16_31 = (offset && 0xffff0000) >> 16;
 }
 
 void init_idt(void) {

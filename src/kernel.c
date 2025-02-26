@@ -11,6 +11,8 @@ void clear_term() {
 }
 
 void kmain() {
+    init_idt();
+    init_pic();
     clear_term();
     disable_cursor();
     set_tty_color(VGA_COLOR(LIGHT_BLUE, 0));
@@ -26,4 +28,7 @@ void kmain() {
     printk("$ ");
     set_tty_color(VGA_COLOR(WHITE, 0));
     enable_cursor();
+
+    asm __volatile__("sti");
+    while (1);
 }

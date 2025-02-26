@@ -27,63 +27,57 @@ Ces instructions sont souvent utilisées ensemble pour interagir avec des périp
 
 #### **3. Liste des ports et registres associés**
 
-Les ports d'E/S et leurs fonctions spécifiques :
+Les ports d'E/S et leurs fonctions spécifiques:
 
 
-| **Port (hex)** | **Nom / Description**                       | **Utilisation**                                                                                                                         |
-| ---------------- | --------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| **0x00**       | N/A                                         | Port réservé                                                                                                                          |
-| **0x01**       | **Keyboard Data Register**                  | Données reçues du clavier (ne sert qu'au PC XT et plus anciens, rarement utilisé sur les systèmes modernes)                         |
-| **0x02**       | **Keyboard Status Register**                | Statut du clavier (rarement utilisé sur les systèmes modernes)                                                                        |
-| **0x03**       | **COM1 Data Register**                      | Données série pour le port COM1                                                                                                       |
-| **0x04**       | **COM1 Interrupt Enable Register**          | Activation des interruptions pour COM1                                                                                                  |
-| **0x05**       | **COM1 Line Control Register**              | Contrôle de la ligne série pour COM1                                                                                                  |
-| **0x06**       | **COM1 Modem Control Register**             | Contrôle du modem pour COM1                                                                                                            |
-| **0x07**       | **COM1 Line Status Register**               | Statut de la ligne série pour COM1                                                                                                     |
-| **0x08**       | **COM1 Modem Status Register**              | Statut du modem pour COM1                                                                                                               |
-| **0x09**       | **Free (available for peripherals)**        | Réservé pour d'autres périphériques                                                                                                 |
-| **0x0A**       | **COM2 Data Register**                      | Données série pour le port COM2                                                                                                       |
-| **0x0B**       | **COM2 Interrupt Enable Register**          | Activation des interruptions pour COM2                                                                                                  |
-| **0x0C**       | **COM2 Line Control Register**              | Contrôle de la ligne série pour COM2                                                                                                  |
-| **0x0D**       | **COM2 Modem Control Register**             | Contrôle du modem pour COM2                                                                                                            |
-| **0x0E**       | **COM2 Line Status Register**               | Statut de la ligne série pour COM2                                                                                                     |
-| **0x0F**       | **COM2 Modem Status Register**              | Statut du modem pour COM2                                                                                                               |
-| **0x10**       | **Printer Port Data Register**              | Données pour l'impression (LPT1)                                                                                                       |
-| **0x11**       | **Printer Port Status Register**            | Statut du port d'impression (LPT1)                                                                                                      |
-| **0x12**       | **Printer Port Control Register**           | Contrôle du port d'impression (LPT1)                                                                                                   |
-| **0x13**       | **Free (available for peripherals)**        | Réservé pour d'autres périphériques                                                                                                 |
-| **0x14**       | **LPT2 Data Register**                      | Données pour l'impression (LPT2)                                                                                                       |
-| **0x15**       | **LPT2 Status Register**                    | Statut du port d'impression (LPT2)                                                                                                      |
-| **0x16**       | **LPT2 Control Register**                   | Contrôle du port d'impression (LPT2)                                                                                                   |
-| **0x17**       | **Free (available for peripherals)**        | Réservé pour d'autres périphériques                                                                                                 |
-| **0x20**       | **Master PIC Command Register (ICW1)**      | Commande d'initialisation pour le PIC maître                                                                                           |
-| **0x21**       | **Master PIC Data Register (ICW2)**         | Données d'initialisation pour le PIC maître (vecteur de départ)                                                                      |
-| **0x22**       | **Slave PIC Command Register (ICW1)**       | Commande d'initialisation pour le PIC esclave                                                                                           |
-| **0x23**       | **Slave PIC Data Register (ICW2)**          | Données d'initialisation pour le PIC esclave (vecteur de départ)                                                                      |
-| **0x24**       | **Master PIC Data Register (ICW3)**         | Commande de configuration pour le PIC maître (connexion du PIC esclave)                                                                |
-| **0x25**       | **Slave PIC Data Register (ICW3)**          | Commande de configuration pour le PIC esclave (indique quel est l'ID de l'esclave)                                                      |
-| **0x26**       | **Master PIC Data Register (ICW4)**         | Commande de configuration pour le PIC maître (mode de fin d'interruption automatique)                                                  |
-| **0x27**       | **Slave PIC Data Register (ICW4)**          | Commande de configuration pour le PIC esclave (mode de fin d'interruption automatique)                                                  |
-| **0x28**       | **System CMOS/RTC (Real-Time Clock)**       | Registre pour lire/écrire dans l'horloge temps réel et la mémoire CMOS                                                               |
-| **0x2F**       | **Free for peripherals**                    | Réservé pour d'autres périphériques                                                                                                 |
-| **0x40**       | **Programmable Interval Timer (PIT)**       | Commandes du temporisateur programmable (PIT), utilisé pour gérer les délais, le timer system et les interruptions de périodicité. |
-| **0x41**       | **Programmable Interval Timer (PIT)**       | Données du temporisateur programmable (PIT).                                                                                           |
-| **0x60**       | **Keyboard Controller Command Register**    | Envoi de commandes au contrôleur du clavier.                                                                                           |
-| **0x61**       | **Keyboard Controller Data Register**       | Données reçues du contrôleur du clavier.                                                                                             |
-| **0x64**       | **Keyboard Controller Command Register**    | Commandes au contrôleur du clavier.                                                                                                    |
-| **0x65**       | **Keyboard Controller Status Register**     | Statut du contrôleur du clavier (indique si le clavier est prêt à recevoir des données).                                            |
-| **0x70**       | **CMOS/RTC (Read/Write Register)**          | Lecture ou écriture dans les registres de la mémoire CMOS (configuration de l'heure, date et paramètres systèmes)                   |
-| **0x71**       | **CMOS/RTC (Read/Write Register)**          | Lire ou écrire dans les registres CMOS (stockage des configurations systèmes)                                                         |
-| **0x80-0x8F**  | **DMA Controller 1 (Direct Memory Access)** | Configuration du premier contrôleur DMA pour le transfert direct de mémoire sans intervention du processeur.                          |
-| **0xA0**       | **Slave PIC Command Register (ICW1)**       | Commande d'initialisation pour le PIC esclave                                                                                           |
-| **0xA1**       | **Slave PIC Data Register (ICW2)**          | Données d'initialisation pour le PIC esclave (vecteur de départ)                                                                      |
-| **0xC0**       | **DMA Controller 2**                        | Configuration du second contrôleur DMA                                                                                                 |
-| **0xC1**       | **DMA Controller 2**                        | Données pour le second contrôleur DMA                                                                                                 |
-| **0xC2**       | **DMA Controller 2**                        | Registre de commande pour le second contrôleur DMA                                                                                     |
-| **0xC3**       | **DMA Controller 2**                        | Registre d'état du second contrôleur DMA                                                                                              |
-| **0xC4**       | **Free for peripherals**                    | Réservé pour d'autres périphériques                                                                                                 |
-| **0xF0-0xF7**  | **Math Coprocessor (FPU)**                  | Registres du coprocesseur mathématique (FPU) (pour les opérations en virgule flottante)                                               |
-| **0xFF**       | **N/A**                                     | Réservé                                                                                                                               |
+| **Adresse(s)**     | **Type de périphérique**                                                                                                                |
+| :------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| **0x00 - 0x1F**    | Premier contrôleur DMA (généralement la puce 8237 A-5, souvent utilisé pour les disquettes).                                          |
+| **0x20 - 0x3F**    | Premier contrôleur d'interruptions programmables (PIC) (généralement la puce 8259A, souvent configuré comme PIC maître).             |
+| **0x40 - 0x5F**    | Temporisateur programmable (généralement la puce 8254).                                                                                 |
+| **0x60 - 0x6F**    | Clavier PS/2 (toujours la puce 8042).                                                                                                     |
+| **0x70 - 0x7F**    | Horloge temps réel (RTC) et masque NMI.                                                                                                  |
+| **0x80 - 0x9F**    | Registres de page DMA (généralement la puce 74LS612).                                                                                   |
+| **0xA0 - 0xBF**    | Deuxième contrôleur d'interruptions programmables (PIC) (généralement la puce 8259A, souvent configuré comme PIC esclave).           |
+| **0xC0 - 0xDF**    | Deuxième contrôleur DMA (généralement la puce 8237 A-5).                                                                              |
+| **0xE9**           | Souvent utilisé pour le "Port 0xE9 Hack". Utilisé dans certains émulateurs pour envoyer du texte directement à la console de l'hôte. |
+| **0xF0 - 0xFF**    | Coprocesseur mathématique (généralement la puce 80287).                                                                                |
+| **0x100 - 0x10F**  | Sélection d'options programmables (POS) (utilisé dans les systèmes PS/2).                                                              |
+| **0x110 - 0x1EF**  | Canal d'entrée/sortie système.                                                                                                          |
+| **0x140 - 0x15F**  | Contrôleur hôte SCSI secondaire.                                                                                                        |
+| **0x170 - 0x177**  | Contrôleur de disque PATA secondaire (souvent utilisé pour les lecteurs CD/DVD ou les disques durs de sauvegarde).                      |
+| **0x1F0 - 0x1F7**  | Contrôleur de disque PATA primaire (presque toujours utilisé pour le disque dur principal / disque de boot).                            |
+| **0x200 - 0x20F**  | Port de jeu.                                                                                                                              |
+| **0x210 - 0x217**  | Unité d'extension.                                                                                                                       |
+| **0x220 - 0x233**  | Carte son Sound Blaster et la plupart des autres cartes son.                                                                              |
+| **0x278 - 0x27F**  | Port parallèle 3.                                                                                                                        |
+| **0x280 - 0x29F**  | Écran LCD sur Wyse 2108 PC (paramètre d'usine par défaut de SMC Elite).                                                                |
+| **0x2B0 - 0x2DF**  | Contrôle d'affichage alternatif pour l'EGA (Enhanced Graphics Adapter).                                                                  |
+| **0x2E8 - 0x2EF**  | Port série 4 (si disponible, souvent COM 4).                                                                                             |
+| **0x2E1**          | Adaptateur GPIB/IEEE-488 0.                                                                                                               |
+| **0x2E2 - 0x2E3**  | Acquisition de données.                                                                                                                  |
+| **0x2F8 - 0x2FF**  | Port série 2 (si disponible, souvent COM 2).                                                                                             |
+| **0x300 - 0x31F**  | Carte prototype.                                                                                                                          |
+| **0x300 - 0x31F**  | Interfaces réseau Ethernet compatibles Novell NE1000.                                                                                    |
+| **0x300 - 0x31F**  | Interface réseau Ethernet AMD Am7990, IRQ=5.                                                                                             |
+| **0x320 - 0x323**  | Interface de disque dur ST-506 et compatibles.                                                                                            |
+| **0x330 - 0x331**  | Unité de traitement MIDI MPU-401 sur la plupart des cartes son.                                                                          |
+| **0x340 - 0x35F**  | Contrôleur hôte SCSI primaire.                                                                                                          |
+| **0x370 - 0x377**  | Contrôleur de disquette secondaire.                                                                                                      |
+| **0x378 - 0x37F**  | Port parallèle 2.                                                                                                                        |
+| **0x380 - 0x38C**  | Adaptateur SDLC (Secondary Binary Synchronous Data Link Control).                                                                         |
+| **0x388 - 0x389**  | Carte de synthétiseur musical AdLib.                                                                                                     |
+| **0x3A0 - 0x3A9**  | Adaptateur SDLC primaire (Primary Binary Synchronous Data Link Control).                                                                  |
+| **0x3B0 - 0x3BB**  | Contrôle d'affichage pour l'adaptateur monochrome (MDA). IBM VGA et prédécesseurs directs.                                             |
+| **0x3BC - 0x3BF**  | Port parallèle 1 sur la carte MDA. IBM VGA et prédécesseurs directs.                                                                   |
+| **0x3C0 - 0x3CF**  | Contrôle d'affichage pour l'EGA (Enhanced Graphics Adapter). IBM VGA et prédécesseurs directs.                                         |
+| **0x3D0 - 0x3DF**  | Contrôle d'affichage pour l'adaptateur graphique couleur (CGA). IBM VGA et prédécesseurs directs.                                      |
+| **0x3E8 - 0x3EF**  | Port série 3 (si disponible, souvent COM 3).                                                                                             |
+| **0x3F0 - 0x3F7**  | Contrôleur de disquette primaire. Contrôleur IDE primaire (disque esclave) (3F6–3F7h).                                                 |
+| **0x3F8 - 0x3FF**  | Port série 1 (si disponible, souvent COM1).                                                                                              |
+| **0xCF8 – 0xCFC** | Espace de configuration PCI.                                                                                                              |
+
+---
 
 #### **4. Fonctionnement avec les registres VGA**
 
