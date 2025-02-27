@@ -18,7 +18,7 @@ void init_idt() {
     idt_ptr.limite = IDT_SIZE * sizeof(idt_entry_t) - 1;
 
     for (unsigned int i = 0; i < IDT_SIZE; i++) {
-        init_idt_entry(KERNEL_CS, (uint32_t)_isr_default, 0x8E, &idt[i]);
+        init_idt_entry(KERNEL_CS, (uint32_t)_isr_keyboard, 0x8E, &idt[i]);
     }
 
     asm("lidtl (idt_ptr)");

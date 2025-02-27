@@ -29,10 +29,10 @@ void init_idt_entry(uint16_t selector, uint32_t offset, uint8_t type, idt_entry_
 void init_idt();
 
 // isr/
-void _isr_default();
+void _isr_keyboard();
 
 // handlers/
-void isr_default_handler(uint32_t int_num);
+void isr_keyboard_handler(uint32_t int_num);
 
 
 #endif

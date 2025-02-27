@@ -42,7 +42,7 @@ uint16_t inw(uint32_t port) {
 // For 4 bytes word
 void outl(uint32_t port, uint32_t value) {
     asm __volatile__ (
-        "outl %%eax, %%dx"
+        "outl %%eax, %%edx"
         :
         : "d" (port), "a" (value)
     );
@@ -51,7 +51,7 @@ void outl(uint32_t port, uint32_t value) {
 uint32_t inl(uint32_t port) {
     uint32_t value;
     asm __volatile__ (
-        "inl %%dx, %%eax"
+        "inl %%edx, %%eax"
         : "=a" (value)
         : "d" (port)
     );
