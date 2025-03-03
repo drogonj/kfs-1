@@ -18,7 +18,14 @@ void clear_tty();
 
 // vga/prompt.c
 extern uint8_t prompt_enabled;
+extern uint8_t pr_map[];
 void init_prompt();
+void pr_newline();
+void pr_add_char_param(unsigned int offset, uint8_t param);
+void pr_remove_char_param(unsigned int offset, uint8_t param);
+uint32_t pr_get_last_char();
+void pr_decrement_line();
+void pr_increment_line();
 
 // vga/cursor.c
 extern uint16_t tty_x;

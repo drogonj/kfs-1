@@ -37,7 +37,7 @@ $(OBJDIR)/%.o: src/%.s
 	@echo "Assembled $< -> $@"
 
 run r: $(OUT)
-	@qemu-system-i386 $(QEMU_FLAGS) $(OUT) -display gtk
+	@qemu-system-i386 $(QEMU_FLAGS) $(OUT)
 	@printf "\033[32mRunning... ✓\033[0m\n"
 
 debug rd: $(OUT)

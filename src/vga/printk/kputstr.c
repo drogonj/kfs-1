@@ -11,7 +11,7 @@ void kputchar(char c) {
         vbuff[offset] = ((uint16_t)tty_color << 8) | c;
 		tty_x ++;
     }
-
+ 
     if (tty_x >= VGA_X_SIZE) {
         tty_x = 0;
         tty_y ++;
