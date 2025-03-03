@@ -8,8 +8,12 @@ void kbd_delete() {
         if (tty_y <= 0 || (uint8_t)(pr_map[(tty_y-1) * VGA_X_SIZE + (VGA_X_SIZE-1)] & 0xF)) {
             return;
         }
-        tty_x = VGA_X_SIZE - 1;
-        kputchar(' ');
+        unsigned int currentOffset = tty_y * VGA_X_SIZE + tty_x;
+        if (prompt_enabled && currentOffset <= pr_get_last_char()) {
+            pr_decrement_line();
+        } else {
+            kputchar(' ');
+        }
         tty_y -= 1;
         tty_x = VGA_X_SIZE - 1;
         while ((uint8_t)(vbuff[(tty_y * VGA_X_SIZE) + (tty_x - 1)] & 0xFF) == ' ' && tty_x > 0) {
@@ -20,7 +24,7 @@ void kbd_delete() {
             return;
         }
         unsigned int currentOffset = tty_y * VGA_X_SIZE + tty_x;
-        if (currentOffset <= pr_get_last_char()) {
+        if (prompt_enabled && currentOffset <= pr_get_last_char()) {
             pr_decrement_line();
         } else {
             tty_x -= 1;
