@@ -73,11 +73,29 @@ void pr_decrement_line() {
     }
 }
 
-void pr_increment_line() {  // TODO add scroll support
+void pr_increment_line() {
     unsigned int offset = tty_y * VGA_X_SIZE + tty_x;
     unsigned int last = pr_get_last_char();
 
     for (unsigned int i = last; i >= offset; i--) {
+        if (last >= VGA_X_SIZE * VGA_Y_SIZE - 1) {
+            pr_scroll_down();
+            last-=VGA_X_SIZE;
+        }
         vbuff[i + 1] = (uint16_t)(vbuff[i]);
     }
+}
+
+void pr_scroll_down() {
+    unsigned int i = 0;
+
+    while (i < VGA_X_SIZE * (VGA_Y_SIZE - 1)) {
+        vbuff[i] = (uint16_t)(vbuff[i + VGA_X_SIZE]);
+        i++;
+    }
+    while (i < VGA_X_SIZE * VGA_Y_SIZE) {
+        vbuff[i] = (0x0F << 8) | ' ';
+        i++;
+    }
+    tty_y--;
 }

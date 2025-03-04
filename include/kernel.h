@@ -5,7 +5,6 @@
 # define VGA_Y_SIZE 25
 
 # include <stdint.h>
-# include <stdarg.h>
 
 # include "./libs.h"
 # include "./colors.h"
@@ -26,6 +25,7 @@ void pr_remove_char_param(unsigned int offset, uint8_t param);
 uint32_t pr_get_last_char();
 void pr_decrement_line();
 void pr_increment_line();
+void pr_scroll_down();
 
 // vga/cursor.c
 extern uint16_t tty_x;

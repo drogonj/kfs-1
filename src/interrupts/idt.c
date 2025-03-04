@@ -1,6 +1,6 @@
 #include "../../include/kernel.h"
 
-__attribute__((aligned(0x10)))idt_entry_t idt[IDT_SIZE];
+idt_entry_t idt[IDT_SIZE];
 idt_ptr_t idt_ptr;
 
 // see https://bitwisecmd.com/ to simulate bits operations
@@ -17,9 +17,7 @@ void init_idt() {
     idt_ptr.base = (uint32_t)&idt;
     idt_ptr.limite = IDT_SIZE * sizeof(idt_entry_t) - 1;
 
-    for (unsigned int i = 0; i < IDT_SIZE; i++) {
-        init_idt_entry(KERNEL_CS, (uint32_t)_isr_keyboard, 0x8E, &idt[i]);
-    }
+    init_idt_entry(KERNEL_CS, (uint32_t)_isr_keyboard, 0x8E, &idt[33]);
 
     asm("lidtl (idt_ptr)");
 }

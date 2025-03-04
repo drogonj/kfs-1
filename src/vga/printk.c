@@ -21,8 +21,12 @@ void kputchar(char c) {
         tty_y ++;
     }
     if (tty_y >= VGA_Y_SIZE) {
-        tty_x = 0;
-        tty_y = 0;
+        if (prompt_enabled) {
+            pr_scroll_down();
+        } else {
+            tty_y = 0;
+            tty_x = 0;
+        }
     }
     set_cursor_pos(tty_x, tty_y);
 }
