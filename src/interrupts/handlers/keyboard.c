@@ -3,6 +3,18 @@
 extern uint16_t tty_x;
 extern uint16_t tty_y;
 
+uint8_t shift_pressed = 0;
+uint8_t ctrl_pressed = 0;
+
+void kbd_change_tty_color() {
+    static uint8_t select = 0xF;
+    
+    if (select == 0)
+        select = 0x10;
+
+    set_tty_color(shift_pressed ? VGA_COLOR(tty_color >> 4, --select) : VGA_COLOR(--select, tty_color & 0x00FF));
+}
+
 void kbd_delete() {
     if (tty_x <= 0) {
         if (tty_y <= 0 || (uint8_t)(pr_map[(tty_y-1) * VGA_X_SIZE + (VGA_X_SIZE-1)] & 0xF)) {
@@ -67,9 +79,8 @@ void kbd_directions(uint8_t code) {
 
 void isr_keyboard_handler(uint32_t int_num) {
     uint8_t scancode = inb(0x60);
-    
-    
-    // printk("%d\n", scancode);
+
+    //printk("%d\n", scancode);
     if (scancode == 1) {
         if (prompt_enabled) {
             clear_tty();
@@ -85,11 +96,21 @@ void isr_keyboard_handler(uint32_t int_num) {
         } 
     } else if (scancode == 14) {
         kbd_delete();
+    } else if (scancode == 42) {
+        shift_pressed = 1;
+    } else if (scancode == 170) {
+        shift_pressed = 0;
+    } else if (scancode == 29) {
+        ctrl_pressed = 1;
+    } else if (scancode == 157) {
+        ctrl_pressed = 0;
+    } else if (scancode == 0x52){
+        kbd_change_tty_color();
     } else if (scancode < 128 && KBD_MAP[scancode]) {
         if (prompt_enabled && tty_y * VGA_X_SIZE + tty_x <= pr_get_last_char()) {
             pr_increment_line();
         }
-        printk("%c", KBD_MAP[scancode]);
+        printk("%c", shift_pressed ? KBD_MAP_SHIFT[scancode] : KBD_MAP[scancode]);
     } else  if (scancode == 72 || scancode == 80 || scancode == 75 || scancode == 77) {
         kbd_directions(scancode);
     }

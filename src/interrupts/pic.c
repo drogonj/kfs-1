@@ -19,8 +19,7 @@ void init_pic(void) {
     outb(0x21, 0x01);
     outb(0xA1, 0x01);
 
-    // Mask interrupts
-    // allow all interrupts
+    // Mask interrupts (except Keyboard)
     outb(0x21, 0xFD);
     outb(0xA1, 0xFF);
 }
