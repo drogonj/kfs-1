@@ -77,42 +77,45 @@ void kbd_directions(uint8_t code) {
     set_cursor_pos(tty_x, tty_y);
 }
 
-void isr_keyboard_handler(uint32_t int_num) {
+void isr_keyboard_handler() {
     uint8_t scancode = inb(0x60);
 
     //printk("%d\n", scancode);
-    if (scancode == 1) {
+    if (scancode == 1) {            // ESC
         if (prompt_enabled) {
             clear_tty();
             set_cursor_pos(0, 0);
         } else {
             init_prompt();
         }
-    } else if (scancode == 28) {
+    } else if (scancode == 28) {    // Enter / Return
         if (prompt_enabled) {
             pr_newline();
         } else {
            kputchar('\n'); 
-        } 
-    } else if (scancode == 14) {
+        }
+    } else if (scancode == 14) {    // Delete
         kbd_delete();
-    } else if (scancode == 42) {
+    } else if (scancode == 42) {    // L_Shift
         shift_pressed = 1;
-    } else if (scancode == 170) {
+    } else if (scancode == 170) {   // L_Shift unpressed
         shift_pressed = 0;
-    } else if (scancode == 29) {
+    } else if (scancode == 29) {    // L_Ctrl
         ctrl_pressed = 1;
-    } else if (scancode == 157) {
+    } else if (scancode == 157) {   // L_Ctrl unpressed
         ctrl_pressed = 0;
-    } else if (scancode == 0x52){
+    } else if (scancode == 0x52){   // KEYPAD_0
         kbd_change_tty_color();
+    } else if (ctrl_pressed && scancode == 0x26 && prompt_enabled) {    // CTRL + l
+        clear_tty();
+        init_prompt();
     } else if (scancode < 128 && KBD_MAP[scancode]) {
         if (prompt_enabled && tty_y * VGA_X_SIZE + tty_x <= pr_get_last_char()) {
             pr_increment_line();
         }
         printk("%c", shift_pressed ? KBD_MAP_SHIFT[scancode] : KBD_MAP[scancode]);
-    } else  if (scancode == 72 || scancode == 80 || scancode == 75 || scancode == 77) {
+    } else  if (scancode == 72 || scancode == 80 || scancode == 75 || scancode == 77) { // Up/Left/Right/Down
         kbd_directions(scancode);
     }
-    outb(0x20, 0x20); // Send EOI (End of Interrupt) -> VERY IMPORTANT 
+    outb(0x20, 0x20); // Send EOI
 }

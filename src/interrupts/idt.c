@@ -15,10 +15,13 @@ void init_idt_entry(uint16_t selector, uint32_t offset, uint8_t type, idt_entry_
 
 void init_idt() {
     idt_ptr.base = (uint32_t)&idt;
-    idt_ptr.limite = IDT_SIZE * sizeof(idt_entry_t) - 1;
+    idt_ptr.limit = IDT_SIZE * sizeof(idt_entry_t) - 1;
 
+    for (unsigned int i = 0; i < IDT_SIZE; i++) {
+        init_idt_entry(KERNEL_CS, (uint32_t)_isr_ignore, 0x8E, &idt[i]);
+    }
     init_idt_entry(KERNEL_CS, (uint32_t)_isr_keyboard, 0x8E, &idt[33]);
 
-    asm("lidtl (idt_ptr)");
+    asm("lidt (%0)" : : "r" (&idt_ptr));
 }
 

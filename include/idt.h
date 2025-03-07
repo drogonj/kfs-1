@@ -4,6 +4,8 @@
 # define IDT_SIZE 256
 # define KERNEL_CS 0x08
 
+// https://wiki.osdev.org/Interrupt_Descriptor_Table
+
 typedef struct idt_entry_s {
     uint16_t isr_offset_low;
     uint16_t selector;
@@ -13,7 +15,7 @@ typedef struct idt_entry_s {
 } __attribute__((packed)) idt_entry_t;
 
 typedef struct idt_ptr_s {
-    uint16_t limite;
+    uint16_t limit;
     uint32_t base;
 } __attribute__((packed)) idt_ptr_t;
 
@@ -30,9 +32,10 @@ void init_idt();
 
 // isr/
 void _isr_keyboard();
+void _isr_ignore();
 
 // handlers/
-void isr_keyboard_handler(uint32_t int_num);
+void isr_keyboard_handler();
 
 
 #endif

@@ -8,6 +8,7 @@
 
 # include "./libs.h"
 # include "./colors.h"
+# include "./gdt.h"
 # include "./idt.h"
 # include "./keyboard.h"
 

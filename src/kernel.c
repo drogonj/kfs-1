@@ -12,6 +12,7 @@ void clear_tty() {
 }
 
 void kmain() {
+    init_gdt();
     init_idt();
     init_pic();
     init_prompt();

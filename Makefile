@@ -11,7 +11,10 @@ GCC_FLAGS = -g -march=i386 -m32 -ffreestanding -O2 -fno-builtin -fno-exceptions 
 LD_FLAGS = -g -m elf_i386
 QEMU_FLAGS = -kernel
 
-OUT = kfs-1.bin
+ISO_DIR = ./iso
+ELF = kfs-1.elf
+ISO = kfs-1.iso
+OUT = $(ISO_DIR)/boot/$(ELF)
 
 OBJDIR = build
 
@@ -45,12 +48,17 @@ debug rd: $(OUT)
 	@printf "\033[32mRunning... ✓\033[0m\n"
 	@gdb -ex "target remote :1234" $(OUT)
 
+build_iso iso: $(OUT)
+	grub-file --is-x86-multiboot $(OUT)
+	grub-mkrescue -o $(ISO) $(ISO_DIR)/
+
 clean:
 	@rm -rf $(OBJDIR)/*
 	@echo "\033[32mCleaned ✓\033[0m"
 
 fclean: clean
 	@rm -f $(OUT)
+	@rm -f $(ISO)
 	@echo "\033[32mFull clean ✓\033[0m"
 
 re: fclean all
