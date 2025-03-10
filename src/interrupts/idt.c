@@ -1,7 +1,7 @@
 #include "../../include/kernel.h"
 
-idt_entry_t idt[IDT_SIZE];
-idt_ptr_t idt_ptr;
+idt_entry_t idt[IDT_SIZE] = {0};
+idt_ptr_t idt_ptr = {0};
 
 // see https://bitwisecmd.com/ to simulate bits operations
 void init_idt_entry(uint16_t selector, uint32_t offset, uint8_t type, idt_entry_t * entry) {

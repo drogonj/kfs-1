@@ -9,12 +9,12 @@ LIB_OBJ = $(patsubst lib/%.c, build/lib/%.o, $(LIB_SRC))
 
 GCC_FLAGS = -g -march=i386 -m32 -ffreestanding -O2 -fno-builtin -fno-exceptions -fno-stack-protector -nostdlib -nodefaultlibs
 LD_FLAGS = -g -m elf_i386
-QEMU_FLAGS = -kernel
 
 ISO_DIR = ./iso
 ELF = kfs-1.elf
 ISO = kfs-1.iso
 OUT = $(ISO_DIR)/boot/$(ELF)
+OUT_ISO = $(ISO_DIR)/boot/$(ISO)
 
 OBJDIR = build
 
@@ -40,17 +40,27 @@ $(OBJDIR)/%.o: src/%.s
 	@echo "Assembled $< -> $@"
 
 run r: $(OUT)
-	@qemu-system-i386 $(QEMU_FLAGS) $(OUT)
-	@printf "\033[32mRunning... ✓\033[0m\n"
+	@qemu-system-i386 -kernel $(OUT)
+	@printf "\033[32mRunning...\033[0m\n"
 
 debug rd: $(OUT)
-	@qemu-system-i386 $(QEMU_FLAGS) $(OUT) -s -S &
-	@printf "\033[32mRunning... ✓\033[0m\n"
+	@qemu-system-i386 -kernel $(OUT) -s -S &
+	@printf "\033[32mRunning...\033[0m\n"
 	@gdb -ex "target remote :1234" $(OUT)
 
 build_iso iso: $(OUT)
-	grub-file --is-x86-multiboot $(OUT)
-	grub-mkrescue -o $(ISO) $(ISO_DIR)/
+	@if [ ! -f $(OUT_ISO) ]; then \
+		grub-file --is-x86-multiboot $(OUT); \
+		grub-mkrescue -o $(OUT_ISO) $(ISO_DIR)/; \
+		printf "\033[32mISO created: $(OUT_ISO) ✓\033[0m\n"; \
+	else \
+		printf "\033[33mISO already exists: $(OUT_ISO) (skipped) ✓\033[0m\n"; \
+	fi
+
+
+run_iso riso: build_iso
+	@qemu-system-i386 -cdrom $(OUT_ISO)
+	@printf "\033[32mRunning...\033[0m\n"
 
 clean:
 	@rm -rf $(OBJDIR)/*
@@ -58,7 +68,7 @@ clean:
 
 fclean: clean
 	@rm -f $(OUT)
-	@rm -f $(ISO)
+	@rm -f $(OUT_ISO)
 	@echo "\033[32mFull clean ✓\033[0m"
 
 re: fclean all

@@ -34,6 +34,7 @@ extern uint16_t tty_y;
 void disable_cursor();
 void enable_cursor();
 void set_cursor_pos(uint16_t x, uint16_t y);
+void set_cursor_shape(uint8_t start_cursor, uint8_t end_cursor);
 
 // vga/printk.c
 extern uint16_t tty_color;

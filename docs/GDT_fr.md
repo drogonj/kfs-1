@@ -8,17 +8,12 @@ définir les droits d'accès, les limites et les bases des segments.
 
 ## Structure de la GDT
 
-La
-GDT est composée d'un tableau de descripteurs de segments. Chaque
+La GDT est composée d'un tableau de descripteurs de segments. Chaque
 descripteur de segment est une structure de 8 octets qui décrit un
 segment de mémoire. Voici les structures de données utilisées pour
 représenter la GDT et ses entrées :
 
 ### Structure du pointeur GDT (`gdt_ptr_t`)
-
-c
-
-Copy
 
 ```
 typedef struct gdt_ptr_s {
@@ -31,10 +26,6 @@ typedef struct gdt_ptr_s {
 * **base** : L'adresse mémoire de début de la GDT.
 
 ### Structure d'une entrée GDT (`gdt_entry_t`)
-
-c
-
-Copy
 
 ```
 typedef struct gdt_entry_s {
@@ -103,10 +94,6 @@ Les flags contiennent des informations supplémentaires sur le segment :
 
 ### Exemple de code pour charger la GDT
 
-c
-
-Copy
-
 ```
 gdt_entry_t gdt[3];  // Exemple avec 3 entrées
 gdt_ptr_t gdt_ptr;
@@ -124,13 +111,153 @@ gdt_ptr.base = (uint32_t)&gdt;
 asm volatile("lgdt %0" : : "m" (gdt_ptr));
 ```
 
-## Utilité de chaque octet
 
-* **Base et Limite** : Définissent l'emplacement et la taille du segment en mémoire.
-* **Access Byte** : Contrôle les droits d'accès et les propriétés du segment.
-* **Flags** : Contrôle la granularité, la taille du segment, et d'autres options.
+## 1. Entrée nulle obligatoire (`gdt[0]`)
 
-En
-résumé, la GDT est une structure clé pour la gestion de la mémoire en
-mode protégé, permettant de définir des segments de mémoire avec des
-droits d'accès et des limites spécifiques.
+```
+gdt[0] = (gdt_entry_t){0, 0, 0, 0, 0, 0, 0};
+```
+
+### Pourquoi cette entrée est-elle nécessaire ?
+
+La première entrée de la GDT est **toujours nulle** .
+Elle est obligatoire car le processeur utilise l'indice 0 comme un
+segment invalide. Si un segment est chargé avec un sélecteur pointant
+vers cette entrée, une exception sera générée.
+
+### Détail des champs :
+
+* **limit_low** : `0` → Limite basse à 0.
+* **base_low** : `0` → Base basse à 0.
+* **base_high_low** : `0` → Base haute (bits 16-23) à 0.
+* **access** : `0` → Aucun droit d'accès (segment invalide).
+* **flags** : `0` → Aucun flag activé.
+* **limit_high** : `0` → Limite haute à 0.
+* **base_high_high** : `0` → Base haute (bits 24-31) à 0.
+
+---
+
+## 2. Segment de code (`gdt[1]`)
+
+### Détail des champs :
+
+#### **limit_low** : `0xFFFF`
+
+* Les 16 bits de poids faible de la limite du segment.
+* Ici, la limite basse est `0xFFFF`, ce qui signifie que la limite totale du segment est de `0xFFFFF` (voir plus bas avec `flags`).
+
+#### **base_low** : `0x0000`
+
+* Les 16 bits de poids faible de la base du segment.
+* La base est `0x00000000`, ce qui signifie que le segment commence à l'adresse `0` en mémoire.
+
+#### **base_high_low** : `0x00`
+
+* Les 8 bits suivants de la base (bits 16-23).
+* Ici, `0x00`, donc la base reste `0x00000000`.
+
+#### **access** : `0x9A`
+
+Le byte d'accès est `0x9A`. Décomposons-le en binaire : `10011010`.
+
+
+| Bit | Valeur | Description                                                                                                                      |
+| ----- | -------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| 7   | 1      | **Present (P)** : Le segment est présent en mémoire.                                                                           |
+| 6-5 | 00     | **Privilege Level (DPL)** : Niveau de privilège 0 (noyau).                                                                      |
+| 4   | 1      | **Descriptor Type (S)** : 1 pour un segment de code/données.                                                                    |
+| 3   | 1      | **Executable (E)** : 1 pour un segment de code (exécutable).                                                                    |
+| 2   | 0      | **Conforming (C)** : 0 pour un segment non-conforme (le code ne peut pas être exécuté à un niveau de privilège inférieur). |
+| 1   | 1      | **Readable (R)** : 1 pour un segment de code lisible.                                                                            |
+| 0   | 0      | **Accessed (A)** : 0 (mis à 1 par le CPU lors de l'accès).                                                                     |
+
+#### **flags** : `0xCF`
+
+Les flags sont `0xCF`. Décomposons-le en binaire : `11001111`.
+
+
+| Bit | Valeur | Description                                             |
+| ----- | -------- | --------------------------------------------------------- |
+| 7   | 1      | **Granularity (G)** : 1 pour une granularité de 4 Ko.  |
+| 6   | 1      | **Size (D/B)** : 1 pour un segment 32 bits.             |
+| 5   | 0      | **Reserved** : Toujours 0.                              |
+| 4   | 0      | **Available (AVL)** : 0 (non utilisé ici).             |
+| 3-0 | 1111   | **Limit High** : Les 4 bits de poids fort de la limite. |
+
+* Avec `G=1`, la limite est multipliée par 4 Ko. La limite totale est donc :
+  * `limit_low = 0xFFFF`
+  * `limit_high = 0xF`
+  * Limite totale = `(0xFFFFF + 1) * 4 Ko = 4 Go`.
+
+#### **limit_high** : `0x00`
+
+* Les 4 bits de poids fort de la limite sont déjà inclus dans `flags`.
+
+#### **base_high_high** : `0x00`
+
+* Les 8 bits de poids fort de la base (bits 24-31).
+* Ici, `0x00`, donc la base reste `0x00000000`.
+
+---
+
+## 3. Segment de données (`gdt[2]`)
+
+```
+gdt[2] = (gdt_entry_t){0xFFFF, 0x0000, 0x00, 0x92, 0xCF, 0x00, 0x00};
+```
+
+### Détail des champs :
+
+#### **limit_low** : `0xFFFF`
+
+* Identique au segment de code, la limite basse est `0xFFFF`.
+
+#### **base_low** : `0x0000`
+
+* La base basse est `0x0000`.
+
+#### **base_high_low** : `0x00`
+
+* La base haute (bits 16-23) est `0x00`.
+
+#### **access** : `0x92`
+
+Le byte d'accès est `0x92`. Décomposons-le en binaire : `10010010`.
+
+
+| Bit | Valeur | Description                                                           |
+| ----- | -------- | ----------------------------------------------------------------------- |
+| 7   | 1      | **Present (P)** : Le segment est présent en mémoire.                |
+| 6-5 | 00     | **Privilege Level (DPL)** : Niveau de privilège 0 (noyau).           |
+| 4   | 1      | **Descriptor Type (S)** : 1 pour un segment de code/données.         |
+| 3   | 0      | **Executable (E)** : 0 pour un segment de données (non exécutable). |
+| 2   | 0      | **Direction (DC)** : 0 pour un segment de données croissant.         |
+| 1   | 1      | **Writable (W)** : 1 pour un segment de données inscriptible.        |
+| 0   | 0      | **Accessed (A)** : 0 (mis à 1 par le CPU lors de l'accès).          |
+
+#### **flags** : `0xCF`
+
+Identique au segment de code :
+
+* **Granularity (G)** : 1 pour une granularité de 4 Ko.
+* **Size (D/B)** : 1 pour un segment 32 bits.
+* **Limit High** : `1111` pour une limite totale de 4 Go.
+
+#### **limit_high** : `0x00`
+
+* Les 4 bits de poids fort de la limite sont déjà inclus dans `flags`.
+
+#### **base_high_high** : `0x00`
+
+* La base haute (bits 24-31) est `0x00`.
+
+---
+
+## Résumé des valeurs choisies
+
+* **Segment de code** :
+  * **Access** : `0x9A` → Segment exécutable, lisible, niveau de privilège 0.
+  * **Flags** : `0xCF` → Segment 32 bits, granularité de 4 Ko, limite de 4 Go.
+* **Segment de données** :
+  * **Access** : `0x92` → Segment de données, inscriptible, niveau de privilège 0.
+  * **Flags** : `0xCF` → Segment 32 bits, granularité de 4 Ko, limite de 4 Go.

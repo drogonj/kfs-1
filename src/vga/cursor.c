@@ -28,6 +28,9 @@ void enable_cursor() {
     outb(0x3D4, 0x0A);
     uint8_t val = inb(0x3D5);
     outb(0x3D5, 0xDF & val);
+    outb(0x3D4, 0x0B);
+    val = inb(0x3D5);
+    outb(0x3D5, 0xDF & val);
     set_cursor_pos(tty_x, tty_y);
 }
 
@@ -40,4 +43,15 @@ void set_cursor_pos(uint16_t x, uint16_t y) {
     outb(0x3D5, offset & 0xFF);
     outb(0x3D4, 0x0E);
     outb(0x3D5, (offset >> 8) & 0xFF);
+}
+
+void set_cursor_shape(uint8_t start_cursor, uint8_t end_cursor) {
+    if (start_cursor > 15 || end_cursor > 15)
+        return;
+        
+    outb(0x3D4, 0x0A);
+    outb(0x3D5, (inb(0x3D5) & 0xC0) | start_cursor);
+
+    outb(0x3D4, 0x0B);
+    outb(0x3D5, (inb(0x3D5) & 0xE0) | end_cursor);
 }

@@ -25,6 +25,7 @@ void init_prompt() {
     printk("kfs-1, a kernel from scratch\n");
     pr_newline();
     enable_cursor();
+    set_cursor_shape(15,15);
     prompt_enabled = 1;
 }
 
