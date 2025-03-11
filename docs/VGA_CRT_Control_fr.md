@@ -2,6 +2,8 @@
 
 Le port **0x3D4** est utilisé pour interagir avec le **contrôleur CRT (Cathode Ray Tube)** du VGA. Ce port est utilisé pour sélectionner un registre interne spécifique du contrôleur, dont les données peuvent ensuite être lues ou écrites via le port **0x3D5** .
 
+Voir [http://www.osdever.net/FreeVGA/vga/crtcreg.htm#0A](http://www.osdever.net/FreeVGA/vga/crtcreg.htm#0A) pour plus de details.
+
 ---
 
 ### Liste des registres accessibles via le port **0x3D4**
@@ -115,11 +117,11 @@ Voici une liste des principaux registres que l'on peut sélectionner avec le por
 ### **0x07 - Overflow**
 
 * **Bits utilisés** :
-  * **0** : Bit 8 de**Vertical Total** .
-  * **1** : Bit 8 de**Start Vertical Display** .
-  * **2** : Bit 8 de**Vertical Retrace Start** .
-  * **3** : Bit 8 de**Vertical Display End** .
-  * **4** : Overflow pour**Start Vertical Blank** .
+  * **0** : Bit 8 de **Vertical Total** .
+  * **1** : Bit 8 de **Start Vertical Display** .
+  * **2** : Bit 8 de **Vertical Retrace Start** .
+  * **3** : Bit 8 de **Vertical Display End** .
+  * **4** : Overflow pour **Start Vertical Blank** .
 * **Bits inutilisés** :**5-7** .
 * **Utilité** :
   * Étend la portée des registres verticaux pour des résolutions plus élevées.
@@ -151,9 +153,9 @@ Voici une liste des principaux registres que l'on peut sélectionner avec le por
 ### **0x0A - Cursor Start**
 
 * **Bits utilisés** :
-  * **0-3** : Ligne de début du curseur (en pixels).
+  * **0-4** : Ligne de début du curseur (en pixels).
   * **5** : Désactive le curseur si activé.
-* **Bits inutilisés** :**4, 6-7** .
+* **Bits inutilisés** : **6-7** .
 * **Utilité** :
   * Configure la hauteur visible du curseur et contrôle son activation.
 
@@ -162,8 +164,8 @@ Voici une liste des principaux registres que l'on peut sélectionner avec le por
 ### **0x0B - Cursor End**
 
 * **Bits utilisés** :
-  * **0-3** : Ligne de fin du curseur (en pixels).
-* **Bits inutilisés** :**4-7** .
+  * **0-4** : Ligne de fin du curseur (en pixels).
+* **Bits inutilisés** :**5-7** .
 * **Utilité** :
   * Ajuste la hauteur totale du curseur.
 

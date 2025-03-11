@@ -14,7 +14,7 @@
 # define GDT_DPL3 0x60
 # define GDT_NOTSYSTEM_SEGMENT 0x10
 # define GDT_EXECUTABLE 0x8
-# define GDT_CONFORMING 0x4
+# define GDT_DC 0x4
 # define GDT_WR 0x2
 # define GDT_ACCESSED 0x1
 

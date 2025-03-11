@@ -24,6 +24,8 @@ void kbd_delete() {
         if (prompt_enabled && currentOffset <= pr_get_last_char()) {
             pr_decrement_line();
         } else {
+            tty_y -= 1;
+            tty_x = VGA_X_SIZE - 1;
             kputchar(' ');
         }
         tty_y -= 1;

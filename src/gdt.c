@@ -1,5 +1,5 @@
-#include "../../include/kernel.h"
-#include "../../include/gdt.h"
+#include "../include/kernel.h"
+#include "../include/gdt.h"
 
 gdt_entry_t gdt[GDT_SIZE] = {0};
 gdt_ptr_t gdt_ptr = {0};
@@ -22,12 +22,7 @@ void init_gdt() {
     // Data segment
     init_gdt_entry(0, 0xFFFFF, (GDT_ACCESSED|GDT_WR|GDT_NOTSYSTEM_SEGMENT|GDT_DPL0|GDT_PRESENT), (GDT_4KB|GDT_32BITS), &gdt[2]);
     // Stack segment
-    init_gdt_entry(0, 0xFFFFF, (GDT_ACCESSED|GDT_WR|GDT_CONFORMING|GDT_NOTSYSTEM_SEGMENT|GDT_DPL0|GDT_PRESENT), (GDT_4KB|GDT_32BITS), &gdt[3]);
-
-    init_gdt_entry(0x0, 0x0, 0x0, 0x0, &gdt[0]);
-    init_gdt_entry(0x0, 0xFFFFF, 0x9B, 0x0D, &gdt[1]);    /* code */
-    init_gdt_entry(0x0, 0xFFFFF, 0x93, 0x0D, &gdt[2]);    /* data */
-    init_gdt_entry(0x0, 0x0, 0x97, 0x0D, &gdt[3]);        /* stac */
+    init_gdt_entry(0, 0xFFFFF, (GDT_ACCESSED|GDT_WR|GDT_DC|GDT_NOTSYSTEM_SEGMENT|GDT_DPL0|GDT_PRESENT), (GDT_4KB|GDT_32BITS), &gdt[3]);
 
     gdt_ptr.base = (uint32_t)&gdt;
     gdt_ptr.limit = sizeof(gdt) - 1;

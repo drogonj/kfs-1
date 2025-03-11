@@ -4,8 +4,8 @@
 
 void init_pic(void) {
     // ICW1
-    outb(0x20, 0x11);
-    outb(0xA0, 0x11);
+    outb(0x20, 0x1B);
+    outb(0xA0, 0x1B);
 
     // ICW2
     outb(0x21, 0x20);
@@ -20,6 +20,6 @@ void init_pic(void) {
     outb(0xA1, 0x01);
 
     // Mask interrupts (except Keyboard)
-    outb(0x21, 0x00);
+    outb(0x21, 0xFD);
     outb(0xA1, 0xFF);
 }

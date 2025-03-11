@@ -3,34 +3,14 @@
 uint16_t tty_x = 0;
 uint16_t tty_y = 0;
 
-// void disable_cursor() {
-//     __asm__ volatile (
-//         "mov $0x3D4, %%dx   \n\t"   // VGA CRT Control's port
-//         "mov $0x0A, %%al    \n\t"   // 0x0A register
-//         "out %%al, %%dx     \n\t"   // select register
-//         "inc %%dx           \n\t"   // 0x3D5 register (data)
-//         "in %%dx, %%al      \n\t"   // get datas
-//         "or $0x20, %%al     \n\t"   // disable cursor
-//         "out %%al, %%dx     \n\t"   // apply changes
-//         : 
-//         : 
-//         : "eax", "edx", "memory"
-//     );
-// }
-
 void disable_cursor() {
     outb(0x3D4, 0x0A);
-    uint8_t val = inb(0x3D5);
-    outb(0x3D5, 0x20 | val);
+    outb(0x3D5, inb(0x3D5) & 0xDF);
 }
 
 void enable_cursor() {
     outb(0x3D4, 0x0A);
-    uint8_t val = inb(0x3D5);
-    outb(0x3D5, 0xDF & val);
-    outb(0x3D4, 0x0B);
-    val = inb(0x3D5);
-    outb(0x3D5, 0xDF & val);
+    outb(0x3D5, inb(0x3D5) & 0xFF);
     set_cursor_pos(tty_x, tty_y);
 }
 

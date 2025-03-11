@@ -26,25 +26,27 @@ Le PIC 8259A nécessite une séquence de 4 commandes ICW (parfois 2 ou 3 selon l
 ##### **ICW1 (port 0x20 ou 0xA0)** :
 
 
-| Bits | Signification                                                    |
-| ------ | :----------------------------------------------------------------- |
-| 0    | Si 1, activer les fonctionnalités de l'ICW4                     |
-| 1    | Si 1, mode à un seul PIC ; si 0, mode en cascade                |
-| 2    | Si 1, Interval d'adresse d'appels a 4 bits ; si 0, 8 bits        |
-| 3    | Si 1, déclenchement par niveau ; si 0, déclenchement par front |
-| 4    | Toujours à 1 pour activer la séquence d'initialisation         |
-| 5-7  | 0                                                                |
+| Bits | Signification                                                                                                                                                                                                                                            |
+| ------ | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 0    | Si 1, activer les fonctionnalités de l'ICW4                                                                                                                                                                                                             |
+| 1    | Si 1, mode à un seul PIC ; si 0, mode en cascade<br />. Le système utilise plusieurs PICs en cascade (connecter les PICs esclaves aux maitres afin de doubler le nombre d'IRQs pouvant etre gerees, IRQ 0-7 pour le maitre et IRQ 8-15 pour l'esclave) |
+| 2    | Si 1, Interval d'adresse d'appels a 4 bits ; si 0, 8 bits                                                                                                                                                                                                |
+| 3    | Si 1, déclenchement par niveau ; si 0, déclenchement par front                                                                                                                                                                                         |
+| 4    | Toujours à 1 pour activer la séquence d'initialisation                                                                                                                                                                                                 |
+| 5-7  | 0                                                                                                                                                                                                                                                        |
 
 Exemple de valeur :
-`0x11` signifie que :
+`0x1B` signifie que :
 
 * ICW4 sera utilisé.
-* Le système utilise plusieurs PICs en cascade.
-* Les interruptions sont déclenchées par des fronts (edge-triggered).
+* Le système utilise plusieurs PICs en cascade (activer les PICs esclaves pour doubler le nombre d'Interruptions pouvant etre gerees par exemple IRQ 0-7 pour le maitre et IRQ 8-15 pour l'esclave).
+* Les interruptions sont déclenchées par des fronts (edge-triggered, un simple "pulse" (changement rapide de 0 à 1 et retour à 0) suffit pour générer une interruption. Dans le cas contraire cela nécessite une gestion plus complexe, car il faut que le périphérique désactive le signal une fois l'interruption traitée. Si ce n'est pas fait, l'interruption pourrait rester active indéfiniment).
 
 ---
 
-##### **ICW2 (port 0x21 ou 0xA1)** :
+##### **ICW2 (port 0x21 ou 0xA1)**
+
+L'ICW2 dit Interrupt Vector Offset defini a quel emplacement dans l'IDT les IRQs commencent.
 
 
 | Bits | Signification                     |
@@ -54,31 +56,34 @@ Exemple de valeur :
 
 Exemple :
 
-* `0x20` pour un maître signifie que la base des vecteurs est 32 (décimal).
-* L'IRQ 0 du PIC maître correspondra au vecteur 32.
+Dans notre cas les indices 0-31 de notre IDT sont reserves aux **interruptions d'exceptions materielles** (exemple: IDT[0] sera l'interruption generee par une division par zero).
+
+Nous indiquons alors au PIC maitre de chercher les IRQ a IDT[32 + n] et au PIC esclave de chercher a IDT[40 + n] grace a l'ICW2.
 
 ---
 
 ##### **ICW3 (port 0x21 ou 0xA1)** :
 
 * **PIC maître** : indique quelles lignes IRQ sont connectées aux esclaves.
-  Exemple : `0x04` signifie que le PIC esclave est connecté à IRQ2.
-* **PIC esclave** : indique l'ID attribué par le maître.
+  Exemple : `0x04` signifie que le PIC esclave est connecté à IRQ2 (3eme bit actif).
+* **PIC esclave** : indique l'ID attribué par le maître, contrairement au maitre on envoi la valeur "directe" qui identifie l'IRQ et non pas un masque de bits.
   Exemple : `0x02` signifie que le PIC esclave est connecté à IRQ2.
+
+  Cet ICW permet simplement de definir via quel IRQ maitre et esclave vont communiquer.
 
 ---
 
 ##### **ICW4 (port 0x21 ou 0xA1)** :
 
 
-| Bits | Signification                                        |
-| ------ | ------------------------------------------------------ |
-| 7-5  | Non utilisés                                        |
-| 4    | Si 1, mode entièrement imbriqué                    |
-| 3    | Si 1, mode bufferisé actif                          |
-| 2    | Si 1, le PIC est maître en mode bufferisé          |
-| 1    | Si 1, activer le mode AEOI                           |
-| 0    | Si 1, activer le mode 8086/88 (mode MCS-80/85 sinon) |
+| Bits | Signification                                                                                                                                                                                                                                                     |
+| ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 7-5  | Non utilisés                                                                                                                                                                                                                                                     |
+| 4    | Si 1, mode entièrement imbriqué (Nested mode). Permet de creer un hierarchie plus complexe de PICs si besoin de gerer plus de 15 IRQs.                                                                                                                          |
+| 3    | Si 1, mode bufferisé actif (Dans ce mode, les**PICs esclaves** peuvent **mettre en tampon** les interruptions avant qu'elles ne soient traitées, le maitre peut alors lire ce tampon quand bon lui semble, optimisant d'avantage la gestion des interruptions). |
+| 2    | Si 1, active le mode bufferise pour le maitre egalement.                                                                                                                                                                                                          |
+| 1    | Si 1, activer le mode AEOI (Auto End of Interrupt)                                                                                                                                                                                                                |
+| 0    | Si 1, activer le mode 8086/88 (mode MCS-80/85 sinon)                                                                                                                                                                                                              |
 
 Exemple de valeur :
 
