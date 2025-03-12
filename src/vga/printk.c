@@ -1,8 +1,8 @@
 #include "../../include/kernel.h"
 
-uint16_t tty_color = 0x0F;
+uint8_t tty_color = 0x0F;
 
-void set_tty_color(uint16_t color) {
+void set_tty_color(uint8_t color) {
     tty_color = color;
 }
 

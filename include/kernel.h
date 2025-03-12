@@ -12,9 +12,11 @@
 # include "./idt.h"
 # include "./keyboard.h"
 
-// kernel.c
+// vga/vga.c
 extern volatile uint16_t * vbuff;
+void disable_blinking();
 void clear_tty();
+void init_vga();
 
 // vga/prompt.c
 extern uint8_t prompt_enabled;
@@ -37,8 +39,8 @@ void set_cursor_pos(uint16_t x, uint16_t y);
 void set_cursor_shape(uint8_t start_cursor, uint8_t end_cursor);
 
 // vga/printk.c
-extern uint16_t tty_color;
-void set_tty_color(uint16_t color);
+extern uint8_t tty_color;
+void set_tty_color(uint8_t color);
 void kputchar(char c);
 void kputstr(char * str);
 void kputhex(unsigned long int n);
