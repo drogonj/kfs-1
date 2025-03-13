@@ -5,6 +5,7 @@ void kmain() {
     init_idt();
     init_pic();
     init_vga();
+
     init_prompt();
 
     asm __volatile__("sti");

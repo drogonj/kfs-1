@@ -51,7 +51,7 @@ debug rd: $(OUT)
 build_iso iso: $(OUT)
 	@if [ ! -f $(OUT_ISO) ]; then \
 		grub-file --is-x86-multiboot $(OUT); \
-		grub-mkrescue -o $(OUT_ISO) $(ISO_DIR)/; \
+		grub-mkrescue --compress=xz -o $(OUT_ISO) $(ISO_DIR)/; \
 		printf "\033[32mISO created: $(OUT_ISO) ✓\033[0m\n"; \
 	else \
 		printf "\033[33mISO already exists: $(OUT_ISO) (skipped) ✓\033[0m\n"; \

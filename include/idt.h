@@ -2,7 +2,7 @@
 # define IDT_H
 
 # define IDT_SIZE 256
-# define KERNEL_CS 0x08
+# define KERNEL_CS 0x08 // Kernel code segment (see GDT)
 
 // https://wiki.osdev.org/Interrupt_Descriptor_Table
 
